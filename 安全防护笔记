@@ -208,6 +208,7 @@ server_tokens off;   //隐藏版本号
   DDOS攻击者会发送大量的并发连接，占用服务器资源（包括连接数、带宽等），这样会导致正常用户处于等待或无法访问服务器的状态。
   Nginx提供了一个ngx_http_limit_req_module模块，可以有效降低DDOS攻击的风险
 修改配置文件在http里面追加:limit_req_zone $binary_remote_addr zone=one:10m rate=1r/s;
+          在server里追加：limit_req zone=one burst=5;
 备注说明：
   limit_req_zone语法格式如下：
     limit_req_zone key zone=name:size rate=rate;
@@ -330,6 +331,62 @@ N选项备注说明：
   A目录下没有txt文件，B目录下有txt文件
   diff比较两个目录时，默认会提示txt仅在B目录有（无法对比差异，修复文件）
   diff比较时使用N选项，则diff会拿B下的txt与A下的空文件对比，补丁信息会明确说明如何从空文件修改后变成txt文件，打补丁即可成功！
+
+################################################## ######################################
+
+iptables基本管理
+  1.关闭firewalld服务
+  2.安装iptables并启动
+  iptables的4个表（区分大小写）：默认4个表
+    nat表（地址转换表）、filter表（数据过滤表）、raw表（状态跟踪表）、mangle表（包标记表）
+  iptables的5个链（区分大小写）： 
+    INPUT链（入站规则）
+    OUTPUT链（出站规则）
+    FORWARD链（转发规则）
+    PREROUTING链（路有前规则）
+    POSTROUTING链（路由后规则）
+  iptables命令的基本使用方法
+    格式：iptables  [-t 表名]  选项  [链名]  [条件]  [-j 目标操作]
+    iptables  -t  filter  -I  INPUT -p  icmp  -j  REJECT
+    iptables -t filter -I  INPUT   -p  icmp  -j  ACCEPT
+    iptables  -I  INPUT  -p  icmp  -j  REJECT    
+    注意事项与规律：
+      可以不指定表，默认为filter表
+      可以不指定链，默认为对应表的所有链
+      除非设置默认策略，否则必须指定匹配条件
+      选项/链名/目标操作用大写字母，其余都小写
+    目标操作：
+      ACCEPT：允许通过/放行    
+      DROP：直接丢弃，不给出任何回应
+      REJECT：拒绝通过，必要时会给出提示
+      LOG：记录日志，然后传给下一条规则
+  iptables命令的使用案例
+    创建规则的案例：
+      # iptables  -t  filter  -A  INPUT  -p tcp  -j  ACCEPT
+      //追加规则至filter表中的INPUT链的末尾，允许任何人使用TCP协议访问本机
+      # iptables  -I  INPUT  -p  udp  -j  ACCEPT
+      //插入规则至filter表中的INPUT链的开头，允许任何人使用UDP协议访问本机
+      # iptables  -I  INPUT 2  -p  icmp  -j  ACCEPT
+      //插入规则至filter表中的INPUT链的第2行，允许任何人使用ICMP协议访问本机
+    查看iptables防火墙规则    
+      # iptables  -nL
+        INPUT                    //仅查看INPUT链的规则
+      # iptables  -L  INPUT  --line-numbers        //查看规则，显示行号
+    删除规则，清空所有规则
+      # iptables  -D  INPUT  3
+      //删除filter表中INPUT链的第3条规则
+      # iptables  -nL  INPUT                //查看规则，确认是否删除
+      # iptables  -F
+      //清空filter表中所有链的防火墙规则
+      # iptables  -t  nat  -F
+      //清空nat表中所有链的防火墙规则
+      # iptables  -t  mangle  -F
+      //清空mangle表中所有链的防火墙规则
+      # iptables  -t  raw  -F
+      //清空raw表中所有链的防火墙规则
+    设置防火墙默认规则
+       iptables  -t  filter  -P  INPUT  DROP
+       iptables  -nL
 
 
 ########################################################################################
