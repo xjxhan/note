@@ -102,7 +102,7 @@ SELinux安全上下文（标签值）
   # gpg -d 加密文件 > 文件名   //解密
 使用GPG的签名机制，检查数据来源的正确性
   # gpg -b 选项   //创建分离式数字签名
-  # scp将签名文件与签名传给其他虚拟机
+  # scp将签名文件与签名传给其他虚拟机本案例要求练习iptables命令的使
   # gpg --verify 签名与签名文件   //在接收签名的机器上，验证签名
 
 ########################################################################################
@@ -428,8 +428,37 @@ iptables基本管理
       修改配置文件，永久生效
       echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
     
-    
+   防火墙扩展规则
+     virt-manager开启虚拟机操作
+     iptables在基本过滤条件的基础上还扩展了很多其他条件，在使用时需要使用-m参数来启动这些扩展功能
+     语法如下：
+       iptables 选项 链名称 -m 扩展模块 --具体扩展条件 -j 动作
+     扩展匹配：
+       mac地址匹配:-m mac --mac-source MAC地址
+       多端口：-m pultiport --sports 源端口列表
+              -m pultiport --dports 目标端口列表
+       ip范围：-m iprange --src-range ip1~ip2
+              -m iprange -dst-range ip1-ip2
+     # ptables -A INPUT -p tcp --dport 22 -m mac --mac-source 52:54:00:00:00:0b -j DROP
+       //拒绝52:54:00:00:00:0b这台主机远程本机,根据MAC地址过滤
+     # iptables -A INPUT -p tcp -m multiport --dports 20:22,25,80,110,143,16501:16800 -j ACCEPT
+       //一次性开启20,21,22,25,80,110,143,16501到16800所有的端口
+     # iptables -A INPUT -p tcp --dport 22 -m iprange --src-range 192.168.4.10-192.168.4.20 -j ACCEPT
+       //允许从 192.168.4.10-192.168.4.20 登录
+     ！！！！注意，这里也可以限制多个目标IP的范围，参数是--dst-range,用法与--src-range一致
      
+   配置SNAT实现共享上网
+     设置防火墙规则，实现IP地址的伪装（SNAT源地址转换）
+     1.开启路由转发功能
+       echo 1 > /proc/sys/net/ipv4/ip_forward
+     2.设置防火墙规则，实现SNAT地址转换
+       iptables -t  nat -A POSTROUTING -s 192.168.4.0/24 -p tcp --dport 80 -j SNAT  --to-source 192.168.2.5
+     3.登陆web主机查看日志
+   扩展知识，对于proxy外网IP不固定的情况可以执行下面的地址伪装，动态伪装IP
+     iptables -t nat -A POSTROUTING -s 192.168.4.0/24 -p tcp --dport 80 -j MASQUERADE     
+  
+    所有iptables规则都是临时规则
+     # service  iptables save   //永久保留规则
 
 
 ########################################################################################
