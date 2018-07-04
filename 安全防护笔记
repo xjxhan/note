@@ -255,7 +255,7 @@ curl命令说明:
   mysqldump -uroot -p123456 mydb table > table.sql      //备份数据库中的某个数据表
   mysqldump -uroot -p123456 mydb > mydb.sql             //备份某个数据库
   mydqldump -uroot -p123456 --all-databases > all.sql   //备份所有数据库
-接下来，还原数据库：
+还原数据库：
   mysql -uroot -p123456 mydb < table.sql                //还原数据表
   mysql -uroot -predhat mydb  < mydb.sql                //还原数据库
   mysql -uroot -predhat < all.sql                       //还原所有数据库
@@ -282,6 +282,8 @@ connectionTimeout="20000"  redirectPort="8443" server="jacob" />
   //修改tomcat目录的权限，让tomcat账户对该目录有操作权限
   su -c /usr/local/tomcat/bin/startup.sh tomcat
   //使用su命令切换为tomcat账户，以tomcat账户的身份启动tomcat服务
+  开机启动文件：/etc/rc.local
+    可以把启动命令添加到开机启动文件里，下次开机会启动
 
 ########################################################################################
 
@@ -336,30 +338,48 @@ N选项备注说明：
 
 iptables基本管理
   1.关闭firewalld服务
-  2.安装iptables并启动
+  2.安装iptables-service并启动
   iptables的4个表（区分大小写）：默认4个表
     nat表（地址转换表）、filter表（数据过滤表）、raw表（状态跟踪表）、mangle表（包标记表）
   iptables的5个链（区分大小写）： 
-    INPUT链（入站规则）
-    OUTPUT链（出站规则）
-    FORWARD链（转发规则）
-    PREROUTING链（路有前规则）
-    POSTROUTING链（路由后规则）
+    INPUT链（入站规则）inptu
+    OUTPUT链（出站规则）output
+    FORWARD链（转发规则）forward
+    PREROUTING链（路有前规则）prerouting
+    POSTROUTING链（路由后规则）postrouting
   iptables命令的基本使用方法
     格式：iptables  [-t 表名]  选项  [链名]  [条件]  [-j 目标操作]
     iptables  -t  filter  -I  INPUT -p  icmp  -j  REJECT
-    iptables -t filter -I  INPUT   -p  icmp  -j  ACCEPT
-    iptables  -I  INPUT  -p  icmp  -j  REJECT    
-    注意事项与规律：
-      可以不指定表，默认为filter表
-      可以不指定链，默认为对应表的所有链
-      除非设置默认策略，否则必须指定匹配条件
-      选项/链名/目标操作用大写字母，其余都小写
+    iptables  -t  filter  -I  INPUT -p  icmp  -j  ACCEPT
+    iptables  -I  INPUT   -p  icmp  -j  REJECT    
+    选项：
+      -t：指定需要维护的防火墙规则表，不使用-t时，默认操作对象为filter
+      -A：追加
+      -D：删除
+      -I：插入
+      -F：清空
+      -L：列出
+      -R：替换
+      -P：设置链默认规则
+      -Z：清空防火墙数据表统计信息
     目标操作：
       ACCEPT：允许通过/放行    
       DROP：直接丢弃，不给出任何回应
       REJECT：拒绝通过，必要时会给出提示
       LOG：记录日志，然后传给下一条规则
+    匹配参数：！是取反
+      -p:匹配协议
+      -s:匹配源地址
+      -d：匹配目标地址
+      -i：入站网卡接口
+      -o：出战网卡接口
+      --stop：源端口
+      --dport：目标端口
+    注意事项与规律：
+      可以不指定表，默认为filter表
+      可以不指定链，默认为对应表的所有链
+      除非设置默认策略，否则必须指定匹配条件
+      选项/链名/目标操作用大写字母，其余都小写
   iptables命令的使用案例
     创建规则的案例：
       # iptables  -t  filter  -A  INPUT  -p tcp  -j  ACCEPT
