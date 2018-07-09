@@ -88,7 +88,8 @@ SELinux安全上下文（标签值）
  # gpg -d a.txt.gpg a.txt   //解密，解密的时候可以把原来要加密的文件删除
 
  GPG非对称加密（需要密钥）
-    非对称加密/解密文件时，UserA生成私钥与公钥，并把公钥发送给UserB，UserB使用公钥加密数据，并把加密后的数据传给UserA，UserA最后使用自己的私钥解密数据。
+    非对称加密/解密文件时，UserA生成私钥与公钥，并把公钥发送给UserB，UserB使用公钥加密数据，
+    并把加密后的数据传给UserA，UserA最后使用自己的私钥解密数据。
   # gpg --gen-key     //创建密钥
   # gpg --list-keys   //查看
   # gpg -a --export 姓名 > 导出的地址   //导出公钥
@@ -159,7 +160,8 @@ echo "tom:123456" | base64   //
 
 部署audit监控文件
   audit:审计工具（启动关不掉）
-  审计的目的是基于事先配置的规则生成日志，记录可能发生在系统上的事件（正常或非正常行为的事件），审计不会为系统提供额外的安全保护，但她会发现并记录违反安全策略的人及其对应的行为。
+  审计的目的是基于事先配置的规则生成日志，记录可能发生在系统上的事件（正常或非正常行为的事件），
+  审计不会为系统提供额外的安全保护，但她会发现并记录违反安全策略的人及其对应的行为。
   审计能够记录的日志内容：
    a) 日期与事件以及事件的结果
    b) 触发事件的用户
@@ -246,7 +248,8 @@ curl命令说明:
 ########################################################################################
 
 数据库安全
-安装完MariaDB或MySQL后，默认root没有密码，并且提供了一个任何人都可以操作的test测试数据库。有一个名称为 mysql_secure_installation的脚本，该脚本可以帮助我们为root设置密码，并禁止root从远程其他主机登陆数据库，并删除测 试性数据库test。
+安装完MariaDB或MySQL后，默认root没有密码，并且提供了一个任何人都可以操作的test测试数据库。
+有一个名称为 mysql_secure_installation的脚本，该脚本可以帮助我们为root设置密码，并禁止root从远程其他主机登陆数据库，并删除测 试性数据库test。
   systemctl status mariadb
   mysql_secure_installation
 
@@ -349,7 +352,8 @@ iptables基本管理
     POSTROUTING链（路由后规则）postrouting
   iptables命令的基本使用方法(从上往下读，匹配及停止)
     格式：iptables  [-t 表名]  选项  [链名]  [条件]  [-j 目标操作]
-    iptables -t 表名 <-A/I/D/R> 规则链名 [规则号] <-i/o 网卡名> -p 协议名 <-s 源IP/源子网> --sport 源端口 <-d 目标IP/目标子网> --dport 目标端口 -j 动作
+    iptables -t 表名 <-A/I/D/R> 规则链名 [规则号] <-i/o 网卡名> -p 协议名 <-s 源IP/源子网> 
+        --sport 源端口 <-d 目标IP/目标子网> --dport 目标端口 -j 动作
     iptables  -t  filter  -I  INPUT -p  icmp  -j  REJECT
     iptables  -t  filter  -I  INPUT -p  icmp  -j  ACCEPT
     iptables  -I  INPUT   -p  icmp  -j  REJECT    
@@ -369,7 +373,7 @@ iptables基本管理
       -d：匹配目标地址
       -i：入站网卡接口
       -o：出战网卡接口
-      --stop：源端口
+      --sport：源端口
       --dport：目标端口
     目标操作：
       ACCEPT：允许通过/放行    
