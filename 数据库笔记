@@ -1,0 +1,1052 @@
+修改root口令，修改密码验证策略：
+  set global validate_password_policy=0;    //只验证长度
+  set global validate_password_length=6;    //修改密码长度，默认长度8
+修改密码：
+  alter user root@"localhost" identified by "密码";
+
+密码永久策略：
+  [mysqld]
+  validate_password_policy=0;
+  validate_password_length=6;
+  alter table 表名 character set utf8;
+
+常用的SQL操作指令：
+  DDL 数据定义语言：create、alter、drop
+  DML 数据操作语言：insert、update、delete
+  DCL 数据控制语言：grant、revoke
+  DTL 数据事物语言：commit、rollback、savepoint
+
+数据库命名规则？：
+  1）可以使用数字/字母/下划线，但不能是纯数字
+  2）区分大小写，具有唯一性
+  3）不可以使用关键字/特殊字符
+
+库管理命令：
+  show databases;      //显示已有的库
+  use 库名;                 //切换库
+  select database();   //显示当前所在的库
+  create database 库名;  //创建新库
+  show tables;         //显示已有的表
+  drop database 库名;    //删除库
+
+表管理命令：
+  create table 库名.表名（
+	字段名1   字段类型（宽度） 约束条件,
+	字段名2   字段类型（宽度） 约束条件,
+	);
+
+  desc 表名;                //查看表结构
+  select * from 表名;    //查看表记录
+  drop table 表名;        //删除表
+  insert into 表名 values(值列表);   //插入表记录
+  update 表名 set 字段=值;   //修改表记录
+  delete from 表名;       //删除表记录
+
+show create teble 库名.表名   //可以查看表用的什么语言
+
+###########################################################################################
+
+字符类型：
+  字符型：姓名、工作单位、通信地址、电话
+    char      定长字符型   255字符
+    varchar   变长字符型   65532字符
+    text/blob 大文本型（音频、视频、图片）
+  数值型：体重、身高、成绩、工资
+    tinyint  微小整型       1字节    -128～127        0～255
+    smallint  小整型         2字节    -32768～32767   0～65535
+    mediumit 中整型         3字节
+    bigint   极大整型       8字节
+    int      大整型         4字节
+    float    单精度浮点型   4字节
+    double   双精度浮点型   8字节
+  枚举型：兴趣爱好、性别
+  日期时间型：出生日期、注册时间
+
+关于整数型字段：（默认有符号范围）
+  使用unsigned修饰时，对应的字段只保存正数   create table t2(level tinyint unsigned); 
+  数值不够指定宽度时，在左边填补空格
+  宽度仅显示宽度，存数值大小由类型决定
+  使用关键字zerofill时，填0代替空格补位
+  数值超出范围时，报错。
+  数值类型的宽度是显示宽度，不能限制字段赋值的大小，字段值的大小由类型决定
+
+关于浮点型字段：
+  定义格式：float(总宽度，小数位数)
+  当字段值与类型不匹配时，字段值作为0处理
+  数值超出范围时，仅保存最大/最小值
+
+字符型：
+  定长：char(字符数)
+    最大长度255字符
+    不够指定字符数时在右边用空格补齐
+    字符数字段超出时，无法写入数据
+  变长：varchar(字符数)
+    最大字符长度 65532
+    按数据实际大小分配存储空间
+    字符数字段超出时，无法写入数据
+  大文本类型：text/blob
+    字符数大与65535存储时使用
+
+枚举型：
+  让字段的值，在规定的范围内选择
+  enum：单选
+    格式：enum(值1，值2，值3，值N)
+  set：多选
+    格式：set(值1，值2，值3，值N)
+
+日期时间类型：
+  日期时间：datetime
+    占8个字节  YYYYMMDDHH:MM:SS
+    范围：1000-01-01  00：00：00：00.000000 ～9999-12-31  23：59：59.999999
+  日期时间：timestamp
+    占4个字节
+    范围：1970-01-01  00：00：00.000000 ～2038-01-19  03：14：07.999999
+  日期：date
+    占4个字节  YYYYMMDD
+    范围：0001-01-01 ～999-12-31
+  年份：year
+    占1个字节   YYYY
+    范围：1901 ～2155
+  时间：time
+    占3个字节
+    格式：HH：MM：SS
+
+关于日期时间字段：
+  当未给timestamp字段赋值时，自动以当前系统时间赋值，而datetime字段默认赋值为null
+year年份处理：
+  默认用4位数字表示
+  当只用2位数字赋值时，01～69视为2000～2069，而70～99视为1970～1999
+
+时间函数：
+  无需库/表，可直接调用，使用select指令输出函数结果,也可以直接赋值
+  now():获取系统当前日期和时间
+  year():执行时动态获得系统日期时间
+  sleep(N):休眠N秒
+  curdate():获取当前的系统日期
+  curtime():获取当前的系统时间
+  month():获取指定时间中的月份
+  date():获取指定时间中的日期
+  time():获取指定时间中的时间
+    select date(now()),time(now())；
+    select now(),sysdate(),curdate();
+
+###########################################################################################
+
+约束条件：
+  Null：允许为空，默认设置
+  NOT NULL：不允许为空
+  key：索引类型
+  default：设置默认值，缺省为null
+
+修改表结构：
+  alter table 表名 执行动作;
+  执行动作：
+    add：添加
+    modify：修改字段类型
+        修改字段类型时，若新的类型与字段已经存储数据冲突，不允许修改
+        不修改的部分要原样写一遍，否则就是还原
+    change：修改字段名
+    drop：删除字段
+    rename：修改表名
+add 添加新字段：
+  add 字段   类型（宽度） 约束条件；
+  add 字段名 类型（宽度） 约束条件，add  字段  类型（宽度） 约束条件；
+  add 字段名 类型（宽度） 约束条件  first；
+  add 字段名 类型（宽度） 约束条件  after 字段名；
+  modify 字段名 类型（宽度） 约束条件；
+  change 源字段名 新字段名 类型（宽度） 约束条件；
+  drop 字段名；
+  rename 新表名；   //表对应的文件名，也会改变
+
+###########################################################################################
+
+索引：给字段值排序的数形结构，类似于"书的目录"
+  索引类型包括：Btree、B+tree、hash
+  优点：通过创建唯一性索引，可以保证数据库表中每一行数据的唯一性，可以加快数据的检索数据
+  缺点：当对表中的数据进行增加、删除和修改的时候，索引也要动态的维护，降低数据的维护速度，索引需要占物理空间
+
+键值类型：
+**  index:普通索引
+    unique:唯一索引
+    fulltext:全文索引
+**  primary key:主键
+**  poreign key:外键
+
+index普通索引
+  使用说明：
+    一个表中可以由多个index字段
+    字段的值允许由重复，且可以赋null值
+    经常把做查询条件的字段设置为index字段
+    index字段的key表值时mul
+  建表的时候指定索引字段
+    index(字段1),index(字段2)....
+        index(id),index(name)
+  在已有的表中设置index字段
+     create index 索引名 on 表名(字段名);
+  删除指定表的索引字段
+     drop index 索引名 on 表名;
+  查看表的索引信息
+      show index from 表名;
+
+主键 primary key:限制如何给字段赋值
+  使用说明：
+    一个表中只能有一个primary key 字段
+    对应的字段值不允许有重复，且不允赋null值
+    如果有多个字段都作为primary key 称复合主键，必须一起创建
+    主键字段的key标志是pri
+    通常与auto_increment 连用,让字段的值自动增长，向表中插入记录时，不给自动增长的字段赋值。
+    经常把表中能够唯一标识记录的字段设置为主键字段 [记录编号字段]
+  建表的时候指定主建字段
+    primary key(字段名)；
+  在已有的表中设置primary key 字段
+    alter table 表名 add primary key(字段名)；
+  移除表中的primary key字段
+    alter table 表名 drop primary key;
+
+foreign key 外键：
+  让当前表字段的值在另一个表中字段值的范围内选择
+  使用外建的条件：
+    表的存储引擎必须是innodb    格式：create table tab()engine=innodb;
+    字段类型要一致
+    被参照字段 必须要是索引类型的一种(primary key)
+  基本用法：
+    foreign key(表A的字段名) references 表B(字段名) on update cascade on delete cascade
+  删除外键字段
+    alter table 表名 drop foreign key 约束名;
+
+###########################################################################################
+
+MySQL存储引擎
+  可插拔式组件，mysql服务软件自带的功能程序，处理表的处理器
+  默认的存储引擎：
+    mysql 5.0/5.1---->myISAM
+    mysql 5.5/5.6---->innoDB
+  查看存储引擎：show engines;
+select user,host from mysql.user
+  设置默认存储引擎
+    /etc/my.cnf
+    default-storage-engine=存储引擎名称
+
+存储引擎特点
+  myisam存储引擎：
+    支持表级锁，不支持事务、事务回滚、外键
+   相关的表文件：
+      表名.frm、表名.MYI、表名.MYD
+
+  innodb存储引擎：
+    支持行级锁定、支持事务、事务回滚、外键
+   相关表文件：
+     表名.frm(表结构数据)、表名.ibd(表数据和index索引)
+	ibdata1(提交成功的数据)
+	ib_logfile0
+	ib_logfile1
+
+  事务(Transactions)：一次sql操作从建立连接到操作完成断开连接的访问过程
+  支持事务/事务回滚：一次sql操作有任意一步没有执行成功，会恢复所有操作(对innodb存储引擎的表，访问时)
+  
+
+###########################################################################################
+
+数据导出：
+  设置搜索路径：默认/var/lib/mysql-files
+    mysql> show variables like "secure_file_priv";      //查看默认使用目录是否存在
+    自定义文件路径：
+	mkdir /mydate
+	chown mysql /mydate      //设置所有者是mysql
+	修改配置文件，更改文件路径：/etc/my.cnf
+	secure_file_priv="/mydate"
+	重启服务
+
+  数据导入：把系统文件的内容存储到数据库服务器的表里
+    把系统文件拷贝到指定目录下
+    创建存储数据的表
+    导入数据
+      mysql> load data infile "目录名/文件名" into table 表名 
+	fields terminated by "分隔符" 
+	lines terminated by "\n";
+    注意事项：
+	字段分隔符要与文件内的一致
+	指定导入文件的绝对路径
+	导入数据的表字段类型要与文件字段匹配
+	禁用selinux保护机制
+    
+  数据导出：把数据库服务器的表里的记录存储到系统文件里
+	sql查询 into outfile "目录名/文件名" 
+	  fields terminated by "分隔符" 
+	  lines terminated by "\n";
+    注意事项：
+	导出的内容由sql查询语句决定
+	导出的是表中的记录，不包括字段名
+	禁用selinux
+
+###########################################################################################
+
+管理表记录
+  增加表字段
+    格式1：添加1条记录，给所有字段赋值
+	insert into 表名 values (值列表);
+    格式2：添加N条记录，给所有字段赋值
+	insert into 表名 values (值列表),(值列表),(值列表);
+    格式3：添加1条记录，给指定字段赋值
+	insert into 表名(字段名列表) values (值列表);
+    格式4：添加N条记录，给指定字段赋值
+	insert into 表名(字段名列表) values (值列表),(值列表),(值列表);
+    注意事项：
+        字段值要与字段类型相匹配
+        对于字符类型的字段，要用双或单引号括起来
+        依次给所有字段赋值时，字段名可以省略
+        只给一部分字段赋值时，必须明确写出对应的字段名称
+
+  查询表记录
+    格式1：select 字段1，..,字段N from 表名;
+    格式2：select 字段1，..,字段N from 表名 where 条件表达式;
+    注意事项：
+	使用*可匹配所有字段
+	指定表名时，可采用 库名.表名 的形式
+
+  更新表记录
+    格式1：更新表内的所有记录
+	update 表名 set 字段1=字段值，字段2=字段名
+    格式2：只给新符和条件的部分记录
+	update 表名 set 字段=字段值，字段2=字段值 where 条件表达式；
+    注意事项：
+	字段值要与字段类型相匹配
+	对于字符类型的字段，要用双或单引号括起来
+	若不使用where限定条件，会更新所有记录
+	限定条件时，只更新匹配条件的记录
+
+  删除表记录
+    格式1：仅删除符和条件的记录
+	delete from 表名 where 条件表达式;
+    格式2：删除所有的表记录
+	delete from 表名;
+
+###########################################################################################
+
+匹配条件
+  基本匹配条件
+    数值比较： = 、> 、>= 、< 、<= 、!=
+    字符比较：= 、!= 、is null(匹配空) 、is not null(非空)
+    逻辑匹配：and(与) 、or(或) 、!(非) 、()提高优先级
+    范围匹配/去重显示
+      in (值列表):在...里...
+	not in (值列表):不在...里...
+	between 数字1 and 数字2：在...之见
+	distinct 字段名：去重显示(只适合select查询使用）
+
+  高级匹配条件
+    模糊查询
+      where 字段名 like '通配符';
+	_：匹配单个字符
+	%：匹配0～N个字符
+    正则表达式
+	where 字段名 regexp '正则表达式';
+	正则字符：^  $  .  [ ]  *  |
+    四则运算：+  -  *  /  %
+
+  操作查询结果
+    聚集函数
+      mysql内置数据统计函数
+	  avg(字段名)：平均值
+	  sum(字段名)：求和
+	  min(字段名)：最小值
+	  max(字段名)：最大值
+	  count(字段名)：个数
+    查询结果排序
+	sql查询 order by 字段名 asc/desc;
+	  字段名：通常是数值类型字段
+    查询结果分组
+	group by 字段名;
+	  字段名：通常是字符类型字段
+	  select name from user group by name;
+	  select name,shell from user group by name,shell;
+    查询结果过滤：在查询结果里过滤数据
+	sql查询 having 条件表达式;
+	sql查询 where 条件 having 条件表达式;
+	sql查询 group by 字段名 having 条件表达式;
+    限制查询结果显示行数
+	sql查询 limit N;    //显示查询结果前N条记录
+	sql查询 limit N,M;  //显示指定范围内的查询记录
+	sql查询 where 条件查询 limit 3;    //显示查询结果前3条记录
+	sql查询 where 条件查询 limit 3,3;  //从第4条开始，共显示3条
+
+###########################################################################################
+
+###########################################################################################
+
+select name from usertab where uid=(select max(uid) from usertab where sex="girl");
+//查看性别是girl用户里 uid号 最大的用户名 叫什么
+
+select count(*) from usertab where sex="girl";
+//统计性别是girl的用户有多少个
+
+select name,uid from usertab where uid like '%%%%'
+//显示uid 是四位数的用户的用户名和uid值
+
+###########################################################################################
+
+复制表
+  将源表xxx复制为新表yyy
+  create table yyy select * from xxx;
+  将指定的查询结果复制为新表zzz
+  create table zzz sql查询语句
+  复制源表xxx的结构到新表vvv
+  create table vvv select * from xxx where false;
+  将源表vvv的名称改为www
+  alter table vvv rename to www;
+  视图
+  create view xxx sql查询(不包括子查询)
+
+多表查询
+  多表查询，也称连接查询
+    将2个或2个以上的表按某个条件连接起来，从中选取需要的数据
+    当多个表中存在相同意义的字段（字段名可以不同）时，可以通过该字段连接多个表
+  格式1：select 字段名列表 from 表a，表b;
+  格式2：select 字段名列表 from 表a,表b  where 条件;
+    笛卡尔集：查询结果的总条目数是 = (表a的记录数 x 表b的记录数)    //把所有的组合都出现一次
+
+where子查询
+  使用where子查询：把内层查询结果作为外层查询的查询条件
+  格式：select 字段名列表 from 表名 where 条件 (select 字段名列表 from 表名 where 条件);
+    select name,age from student where age < (select avg(age) from student);
+     //输出年龄小于平均年龄的学生的名字和年龄
+
+左、右、内连接查询
+  select 字段名列表 from 表a left join 表b on 条件表达式;
+  select 字段名列表 from 表a right join 表b on 条件表达式;
+  select 字段名列表 from 表a inner join 表b on 条件表达式;
+
+###########################################################################################
+
+mysql管理工具
+  mysql管理方式：
+    mysql命令的局限性？
+    是否有图形化、更加直观的管理软件
+    能通过web界面访问吗？
+  常见的管理工具：
+    类型                 界面    操作系统    说明
+   mysql            命令行  跨平台      mysql官方bundle包自带
+   mysql-workbench  图形    跨平台      mysql官方提供
+   mysql-front      图形    windows   开源，轻量级客户端软件
+   phpmyadmin       浏览器  跨平台      开源，需lamp平台
+   navicat          图形    windows   专业、功能强大，商业版
+
+  phpmyadmin
+    1.安装httpd、mysql、php-mysql及相关包
+    2.启动httpd服务程序
+    3.解压phpmyadmin包，部署到网站目录
+	tar -xf phpMyAdmin-2.11.11-all-languages.tar.gz -C /var/www/html
+	cd /var/www/html
+	mv phpMyAdmin-2.11.11-all-languages/ phpmyadmin/
+	chown -R apache:apache phpmyadmin/
+	cp phpmyadmin/config.sample.inc.php phpmyadmin/config.inc.php
+    4.配置config.inc.php,指定mysql主机地址
+	vim phpmyadmin/config.inc.php
+	  $cfg['blowfish_secret'] = 'plj123';
+	  $cfg['Servers'][$i]['host'] = 'localhost';
+    5.创建授权用户
+    6.浏览器访问、登录使用
+
+###########################################################################################
+
+用户授权及撤销
+  密码恢复及设置
+     恢复mysql管理员密码
+	修改配置文件：/etc/my.cnf
+	   skip_grant_tables
+	重启服务
+	进入数据库更改密码：password():加密函数
+	  update mysql.user set authentication_strint=password("密码") \
+	    > where user="root" and host="localhost";
+	  flush privileges;    //重新加载权限列表，更新权限
+     设置管理员密码
+	mysqladmin -uroot -p password "新密码"
+  创建授权
+    mysql授权库和表信息
+	user表：已经添加的连接用户
+	db表：记录已添加的连接用户对数据库的访问权限
+	tables_priv表：存储授权用户对表的访问权限
+	columns_priv表：存储授权用户对字段的访问权限
+    grant配置授权
+	grant 权限列表 on 库名.表名 to 用户名@"客户端地址" identified by “密码” [ with grant option ];
+	   with grant option：是否有授权权限
+	客户端地址：
+	  %：匹配所有主机
+	  192.168.4.%：匹配指定的一个网段
+	  %.tarena.com：匹配一个DNS区域
+	  svr1.tarena.com：匹配指定域名的单个主机
+     查看用户授权
+	show grants;    //用户查看自己权限
+	show grants for 用户名@"客户端地址";
+     重设用户密码
+	set password=password("新密码");     //授权用户连接后修改密码
+	set password for 用户名@"客户端地址"=password("新密码");
+
+  撤销授权
+    撤销用户权限
+	revoke 权限列表 on 库名.表名 from 用户名@"客户端地址";
+  删除授权用户（删除添加的连接用户）
+    drop user root@"客户机地址";
+
+###########################################################################################
+
+mysqldump备份/恢复
+  数据库备份概述
+    数据备份方式
+      物理备份(备份库和表对应系统文件)：冷备：cp、tar
+      逻辑备份：mysqldump  mysql2132
+    数据备份策略
+      完全备份：备份所有数据
+      增量备份：备份上次备份后，所有新产生的数据
+      差异备份：备份完全备份后，所有新产生的数据
+  物理热备
+    物理备份及恢复
+  逻辑备份
+    逻辑备份：mysqldump -uroot -p 密码 库名 > 路径/xxx.sql
+    恢复：mysql -uroot -p 密码 库名 < 路径/xxx.sql
+  库名表示方式：
+    --all-databases/-A:所有库
+     数据库名：单个库
+     数据库名 表名：单张表
+    -B 数据库1 数据库2：多个库
+！！！！注意：无论备份还是恢复，都要验证用户权限
+
+###########################################################################################
+
+实时增量备份/恢复
+binlog日志概述
+  二进制日志用途及配置方式             配置
+  二进制日志：记录所有更改数据的操作：log_bin[=dir/name]/server_id=数字/max_binlog_size=数字m
+
+启用binlog日志
+  记录除查询之外的所有sql命令，可用于数据恢复，配置mysql主从同步的必要条件
+  /etc/my.cnf
+    log-bin           //启用binlog日志
+    server_id=100     //指定id值(最好和主机位一样，以免冲突)
+    binlog-format="mixed"    //记录命令和产生的信息
+  记录格式：
+    statement:每一条修改数据的sql命令都记录
+    row:不记录sql语句上下文相关信息，仅保存哪条记录被修改
+    minxed:命令和产生的信息都记录
+查看日志文件
+  mysqllogbin 选项 host50-bin.000001
+  选项：
+    --start-position=数字
+    --stop-position=数字
+    --start-datetime="yyyy-mm-dd hh:mm:ss"
+    --stop-datetime="yyyy-mm-dd hh:mm:ss"
+
+恢复数据
+  mysqlbinlog  选项  mysql-bin.000001 | mysql -uroot -p123456
+
+show master status;    //查看正在使用的日志文件
+
+自定义日志文件：
+  修改配置文件：log-bin=/logdir/db50
+  重启mysql服务
+
+手动生成日志文件4种方法：
+   1.重启服务
+   2.在数据库里：flush logs;
+  3.mysqldump --flush-logs
+  4.mysql -uroot -p123456 -e 'flush logs';
+
+清理binlog日志
+  删除早于指定版本的binlog日志
+   purge master logs to "binlog文件名";
+  删除所有binlog日志，重建新日志
+   reset master;
+
+###########################################################################################
+
+innobackupex备份/恢复
+
+XtraBackup工具
+  一款强大的在线备份工具
+  备份过程中不锁库表，适合生产环境
+  由专业组织Percona提供（改进mysql分支）
+  包含两个组件：
+    xtrabackup:C程序、支持innodb/XtraDB
+    innobackupex:以perl脚本封装xtrabackup,还支持myisam
+
+ 1.下载适配的rpm包并安装
+    percona-xtrabackup-24-2.4.7-1.el7.x86_64.rpm
+    会有依赖包也需要安装：
+    yum -y install perl-DBD-mysql perl-Digest-MD5
+    libev-4.15-1.el6.rf.x86_64.rpm
+    rpm -ql percona-xtrabackup-24
+	/usr/bin/innobackupex:备份innodb、xtrdb、myisam引擎的表
+	/usr/bin/xtrabackup:备份innodb、xtrdb引擎的表
+
+格式：innobackupex [选项]
+innobackupex常用选项：
+  备份：
+  --host
+  --user
+  --port
+  --password
+  --databases
+    --databases="库名"
+    --databases="库1 库2"
+    --databases="库名.表名"
+  --no-timestamp:不用日期命名备份文件存储的子目录
+  恢复：
+  --redo-only:日志合并
+  --apply-log:准备还原(回滚日志)
+  --copy-back:恢复数据
+  --incremental 目录名:增量备份
+  --incremental-basedir=目录名:增量备份时，指定上一次备份数据存储的目录名
+  --incremental-dir=目录名:准备恢复数据时，指定增量备份数据存储的目录名
+  恢复单个表：
+  --expore:导出表信息
+  import:导入表空间
+
+lsn:日志序列号
+
+###########################################################################################
+
+主从同步原理：
+  master，记录数据更改操作
+    启用binlog日志
+    设置binlog日志格式:binlog-format="mixed"
+    设置server_id
+  slave运行2个线程
+    slave_IO:复制master主机，binlog日志文件的sql到本机的relay-log文件里
+    slave_SQL:执行本机relay-log文件里的sql语句，重现master的数据操作
+
+授权用户
+  grant replication slave on *.* to 用户名@'从库ip地址' identified by “密码”;
+  show master status;    //查看master状态
+
+从服务器
+  server_id=
+指定主库信息：
+  change master to \
+  master_host="主库ip地址" \
+  master_user="主库授权用户名" \
+  master_password="授权用户密码" \
+  master_log_file="日志文件" \
+  master_log_pos="偏移量";
+
+  start slave;
+！！！！master信息会自动保存到/var/lib/mysql/master.info 文件，更改master信息时，应先stop slave
+
+  master.into:主库信息
+  relay-log.info:中继日志信息
+  主机名-relay-bin.xxxx:中继日志
+  主机名-relay-bin.index:索引
+
+恢复独立数据库
+  stop slave;
+  在命令行把主库信息和中继信息全删除，在重启服务即可
+
+###########################################################################################
+
+一主多从
+  确保数据相同
+    从库必须要有主库上的数据(主库可以使用完整备份，导入到从库)
+	mysqldump、mysql
+  配置主服务器
+    启用binlog日志、授权用户、查看当前正在使用的日志
+  配置从服务器
+    设置server_id，指定主库信息
+  测试配置
+    客户端连接主库写入数据，在从库上也能查询到
+
+主从从
+  log_slave_updates:为了让从库同步其他从库的数据
+
+主库配置选项
+  binlog_do_db=name:设置master对哪些库记录日志
+  binlog_ignore_db=name:设置master对哪些库不记录日志
+从库配置选项
+  relay_log=中继日志名
+  replicate_do_db=masql:仅复制指定库，其他库将被忽略，省略时复制多有库
+  replicate_ignore_db=test:不复制哪些库，其他库将被忽略，ignore_db与do_db 只能选用一种
+
+###########################################################################################
+
+show variables like "have_dynamic_loading";    //是否允许动态加载模块
+半同步配置
+select plugin_name,plugin_status from information_schema.plugins where plugin_name like '%semi%';
+//查模块
+
+主库上配置：
+  install plugin rpl_semi_sync_master SONAME 'semisync_master.so';    //安装模块，主库上
+  show variables like 'rpl_semi_sync_%_enabled';    //查看安装的插件是否开启
+  set global rpl_semi_sync_master_enabled = 1;      //开启
+
+从库上配置：
+  install plugin rpl_semi_sync_slave SONAME 'semisync_slave.so';
+  set global rpl_semi_sync_slave_enabled = 1;      //开启
+
+永久启用半同步复制
+/etc/my.cnf
+  plugin-load="rpl_semi_sync_master=semisync_master.so"
+  plugin-loag="rpl_semi_sync_slave=semisync_slave.so"
+  rpl_semi_sync_master_enabled=1
+  rpl_semi_sync_slave_enabled=1
+
+###########################################################################################
+
+mysql数据读写分离
+  把客户端查询数据库的请求和写入数据的请求，分别给不同的数据库服务器处理
+  减轻主库的并发访问压力，提高从库的硬件利用率
+
+人肉分离：需要程序员协同完成，规定程序在存储数据时连接master数据库服务，查询数据时连接slave数据库服务
+
+maxscale下载地址:https://downloads.mariadb.com/files/maxscale
+
+配置主写分离
+  1.部署mysql主从同步结构(一主一从)
+  2.测试主从同步配置
+  3.配置读写分离服务器
+    装包maxscale-2.1.2-1.rhel.7.x86_64.rpm
+    修改配置文件/etc/maxscale.cnf
+	  9 [maxscale]
+        10 threads=auto
+
+	 18 [server1]               //定义数据库服务启主及名
+       19 type=server
+       20 address=192.168.4.51    //master主及ip地址
+       21 port=3306
+       22 protocol=MySQLBackend
+	   [server1]                //定义数据库服务器
+         type=server
+         address=192.168.4.52     //slave主及ip地址
+         port=3306
+         protocol=MySQLBackend
+
+	   [MySQL Monitor]           //定义要监视的数据库服务器
+	   servers=server1, server2  //定义主从数据服务器主及名
+         user=scalemon
+         passwd=123456
+
+	  [Read-Write Service]      //定义实现读写分离的数据库服务器
+	  servers=server1, server2
+	  user=maxscale
+	  passwd=123456
+
+	  [MaxAdmin Service]        //管理服务
+
+根据配置文件的设置，在主从数据录服务器上创建用户
+grant replication slave,replication client on *.* to scalemon@"%" identified by "123456";
+grant select on mysql.* to maxscale@"%" identified by "123456";
+在其他主机上测试授权用户
+    启服务、查服务信息
+      maxscale -f /etc/maxscsle.cnf
+    4.测试配置
+      在本机访问管理管端口查看监控状态
+      maxadmin  -P4016  -uadmin  -pmariadb
+	list servers
+      客户端访问数据读写分离服务器
+      mysql -h192.168.4.56 -P4006 -uwebuser -p123456
+    
+###########################################################################################
+
+多实例服务
+  装包：mysql-5.7.20-linux-glibc2.12-x86_64.tar.gz
+    mv mysql-5.7.20-linux-glibc2.12-x86_64 /usr/local/mysql
+  修改PATH变量
+    vim /etc/profile
+    export PATH=/usr/local/mysql/bin:$PATH
+    source /etc/profile
+  新建主配置文件
+    mv /etc/my.cnf /etc/my.cnf.bak
+    vim /etc/my.cnf
+	每个实例要有独立的数据库目录和监听端口号
+	每个实例要有独立的实例名称和独立的 sock 文件
+	[mysqld_multi] // 启用多实例
+	mysqld = /usr/local/mysql/bin/mysqld_safe     // 指定进程文件的路径
+	mysqladmin = /usr/local/mysql/bin/mysqladmin  // 指定管理命令路径
+	user = root                      // 指定调用进程的用户
+
+	[mysqlX]                         // 实例进程名称 ,X 表示实例名称 , 如 [mysql2]
+	port = 3307                      // 端口号
+	datadir = /data3307              // 数据库目录 ,要手动创建
+	socket = /data3307/mysql.sock    // 指定 sock 文件的路径和名称
+	pid-file = /data3307/mysqld.pid  // 进程 pid 号文件位置
+	log-error = /data3307/mysqld.err // 错误日志位置
+  创建数据库目录
+    mkdir /data3307
+    mkdir /data3308
+  #修改属主属组权限
+    #chown -R mysql:mysql /data3307
+    #chown -R mysql:mysql /data3308
+  初始化授权
+    会提示root用户登录的初始化密码
+    mysqld --user=mysql --basedir= 软件安装目录 --datadir= 数据库目录 – initialize // 初始化授权库
+    mysqld --user=mysql --basedir=/usr/local/mysql --datadir=/data3307 --initialize
+  启服务
+    mysqld_multi start 1
+    mysqld_multi start 2
+    mysqld_multi --user=root --password=密码 stop 实例编号
+  客户端测试
+    mysql -uroot -p'fj24yQ1fnC<(' -S /data3307/mysql.sock    //登录，密码是初始化时候的初始密码
+    alter user root@"localhost" identified by "123456";      //修改密码
+    
+mysql优化
+  设置会影响服务性能参数的值
+  并发连接数量、连接超时时间
+  max_connections:允许的最大并发连接数
+  connect_timeout:等待连接超时，默认10秒，仅登录时有效
+  wait_timeout:等待关闭连接的不活动超时秒数，默认28800秒(8小时)
+  曾经有过的最大连接数/并发连接数:0.85 * 100% = 85%
+  show variables         //查看所有变量
+  set global 变量 = 值     //修改全局变量
+  show global status;    //查看状态
+  show global status like "Max_used_connections";    //查看当前已使用的连接数
+  可以重复使用的线程数量
+  key_buffer_size:用于myisam引擎的关键索引缓存大小
+  sort_buffer_size:为每个要排序的线程分配此大小的缓存空间
+  read_buffer_size:为顺序读取表记录保留的缓存大小
+  thread_cache_size:允许保存在缓存中被重用的线程数量
+  table_open_cache:为多有线程缓存的打开的表的数量
+  show variables like "%thread%";    //查线程
+  所有mysql程序打开表的数量
+  缓存参数控制
+  query_cache_wlock_invalidate | OFF    //查询缓存写锁无效(myisam)
+
+mysql体系结构 （由8个功能模块组成）：
+管理工具： 安装服务软件后，提供的命令 
+  mysqldump、mysqlbinlog、mysqladmin
+连接池： 当接收到客户端的连接请求后，检查是否有资源响应客户端的连接请求。
+SQL接口： 把sql传递给mysqld线程处理
+分析器： 检查执行的sql命令是否有语法错误，和是否有访问权限。
+优化器：优化执行的sql命令，已最节省资源的方式执行sql命令
+查询缓存： 缓存曾经查找到的记录,缓存空间从物理内存划分出来的。
+存储引擎： 是表的处理器，不同的存储引擎有不同的功能和数据存储方式。Myisam   innodb
+文件系统： 存储表中记录的磁盘
+
+explain
+
+常用日志种类：
+  log-error[=name]错误日志：记录启动/运行/停止过程中的错误信息
+  general-log
+  general-log-file= 查询日志：记录客户端连接和查询操作
+  slow-query-log
+  slow-query-log-file=
+  long-query-time= 慢查询日志：记录耗时较长或不使用索引的查询操作
+
+###########################################################################################
+
+集群：使用多台服务器提供相同的服务
+集群类型：LB(负载均衡集群)、HA(高可用集群)、HPC(高计算集群)
+高可用集群：由日本DeNA公司youshimaton开发
+  是一套优秀的实现mysql高可用的解决方案
+  数据库的自动故障切换操作能做到在0～30秒之内
+  MHA能确保在故障切换过程中保证数据的一致性，以达到真正意义上的高可用
+MHA Manager(管理节点)
+  可以单独部署在一台独立的机器上，管理其他节点，也可以部署在一台slave节点上
+MHA Node(数据节点)
+  运行在每台myslq服务器上
+MHA软件介绍
+
+MHA工作过程
+  由Manager定时探测集群中的master节点
+  当master故障时，Manager自动将拥有最新数据的slave提升为新的master
+  关键点：
+    1）从宕机崩溃的master保存二进制日志事件
+    2）识别含有最新更新的slave
+    3）应用差异的中继日志(relay log)到其他的slave
+    4）应用从master保存的二进制日志事件
+    5）提升一个slave为新的master
+    6）使其他的slave连接新的master进行复制
+
+部署MHA集群
+  ip规划：
+    master主节点服务器  192.168.4.51   master51
+     备用1主节点服务器     192.168.4.52  master52(slave)
+     备用2主节点服务器     192.168.4.53  master53(slave)
+     第1台slave服务器     192.168.4.54  slave54
+     第2台slave服务器     192.168.4.55  slave55
+    MHA_manager服务器   192.168.4.56  mgm56
+    VIP地址                192.168.4.100
+  安装软件包
+    
+配置管理服务器
+安装yum -y install perl-DBD-mysql
+   rpm -ivh mha4mysql-node-0.56-0.el6.noarch.rpm
+   yum -y install perl-ExtUtils-*
+   yum -y install perl-CPAN*
+   tar -xf mha4mysql-manager-0.56.tar.gz 
+   cd mha4mysql-manager-0.56/
+   perl Makefile.PL 
+   make && make install
+
+配置管理主机
+  mha4mysql-manager-0.56/samples
+  cp conf/app1.cnf  /etc/mha_manager/
+  vim /etc/mha_manager/app1.cnf
+    [server default]
+    manager_workdir=/etc/mha_manager/
+    manager_log=/etc/mha_manager/manager.log
+    master_ip_failover_script=/etc/mha_manager/master_ip_failover一 、部署集群环境：
+
+    ssh_user=root
+    ssh_port=22
+    repl_user=repluser    //主从同步用户名
+    repl_password=123456  //密码
+    user=root             //数据库用户名
+    password=123456       //密码
+
+    [server1]
+    hostname=192.168.4.51
+    port=3306
+    candidate_master=1    //设置为候选master
+
+    [server2]
+    hostname=192.168.4.52
+    port=3306
+    candidate_master=1
+
+    [server3]
+    hostname=192.168.4.53
+    port=3306
+    candidate_master=1
+
+    [server4]
+    hostname=192.168.4.54
+    port=3306
+    no_master=1           //不竞选master
+
+    [server5]
+    hostname=192.168.4.55
+    port=3306
+    no_master=1
+
+
+masterha_check_ssh:         检查MHA的ssh配置状况
+masterha_check_repl:        检查mysql复制状况
+masterha_manager:           启动MHA
+masterha_check_status:      检测MHA运行状态
+masterha_master_monitor:    检测master是否宕机
+
+一主多从  主从同步结构
+在做主机的主机上 开启半同步复制 且设置不自动删除中继日志文件 
+配置ssh秘钥对认证登陆
+所有数据库服务器要给管理主机添加监控时的连接用户
+grant all on *.* root@“%” identified by "密码";
+所有主机上都要安装软件依赖的perl软件包
+
+二、配置集群：
+1 配置数据库服务器：安装mha_node软件包
+2 配置管理主机：
+2.1 安装软件包：mha_node   和  mha_manager
+2.2 创建管理命令
+2.3 编写主配置文件 app1.cnf
+2.4 根据配置文件的设置
+在数据库服务器上创建监控用户
+在本机创建故障切换脚本， 并修改脚本 指定vip 部署的网络接口名
+
+2.5  测试主配置文件 app1.cnf
+测试ssh服务  masterha_check_ssh    --conf=
+测试主从同步 masterha_check_repl   --conf=
+
+2.6  手动把规定的vip地址部署在当主库 51 上
+
+2.7  启动管理服务 并查看状态
+
+三、测试集群
+3.1 访问集群存储数据：
+50]#  mysql  -h vip地址    -uuser8   -p123qqq...A
+MySQL>  select  @@hostname;
+
+3.2  测试高可用
+把当前主库51 的数据库服务停止，但客户端访问数据库连接不会断，查看主机名显示的是52主机的主机名；在52本机查看VIP地址也能够查看到。
+主库51的配置在管理主机56的app1.cnf文件里查看不到了。
+
+四、把坏掉的主机51 添加到集群里。
+51]# 启动数据库服务，并指定当前主库信息
+
+56]# 在主配置文件app1.cnf里添加 主51的信息 ，并启动管理服务
+    //自动failover的切换脚本
+
+###########################################################################################
+mysql -uroot -p123456
+ERROR 2002 (HY000): Can't connect to local MySQL server through socket '/tmp/mysql.sock' (2)
+[client]
+default-character-set=utf8
+socket=/var/lib/mysql/mysql.sock
+ 
+[mysql]
+default-character-set=utf8
+socket=/var/lib/mysql/mysql.sock
+
+###########################################################################################
+
+视图
+视图规则：
+  不能在视图上创建索引
+  不能使用from子查询
+  包含聚合函数不能更新
+  常量视图、join、from一个不能更新的视图
+create view 视图名称 as sql查询
+create view 视图名称(字段名列表) as sql查询
+  在视图表中不定义字段名的话，默认使用基表的字段名
+  若定义字段名的话，视图表中的字段必须和基表的字段个数相等
+
+创建视图的完全格式
+  CREATE
+    [OR REPLACE]
+    [ALGORITHM = {UNDEFINED | MERGE | TEMPTABLE}]
+    [DEFINER = { user | CURRENT_USER }]
+    [SQL SECURITY { DEFINER | INVOKER }]
+    VIEW view_name [(column_list)]
+    AS select_statement
+    [WITH [CASCADED | LOCAL] CHECK OPTION]
+
+###########################################################################################
+
+流程控制函数:控制循环结构
+
+ loab1:loop
+ LEAVE 标签名;
+
+ITERATE 标签名;
+
+
+
+delimiter //
+create procedure showlines(in numbers int(2))
+begin
+if numbers is null then
+select id,name,password from db9.user limit 1;
+else 
+select id,name,password from db9.user limit numbers;
+end if;
+end
+//
+delimiter ;
+
+delimiter //
+create procedure repeate()
+begin
+declare x int(2) default 1;
+repeat
+select x;
+set x=x+1;
+until x=1
+end repeat;
+end
+//
+
+
+
+redis-cli -h 192.168.4.51 -p 6351 shutdown    //停止端口
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
