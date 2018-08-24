@@ -1,0 +1,246 @@
+git-1.8.3.1-13.el7.x86_64
+git clone git://124.193.128.166/nsd1804.git    //克隆
+git pull    //同步笔记
+更新(必须进入 git 目录)
+git push origin master     //上传
+
+########################################################################################
+
+yum源
+  createrepo .              //创建
+  createrepo --update .     //更新
+
+virt-manager   //图形管理工具
+virt-install   //系统安装工具
+virt-v2v       //虚拟机迁移工具
+virt-p2v       //物理机迁移工具
+安装虚拟化服务器平台：必备软件
+  qemu-kvm         //为 kvm 提供底层仿真支持     
+  libvirt-daemon   //libvirtd 守护进程,管理虚拟机
+  libvirt-client   //用户端软件,提供客户端管理命令
+  libvirt-daemon-driver-qemu      //libvirtd 连接 qemu 的驱劢
+systemctl start libvirtd    //安装完启动守护进程
+
+一个物理机节点称为node
+一个域称为dom
+
+brctl show    //查看虚拟交换机
+Tvirsh console    //连接到虚拟机
+virsh -c qemu+ssh://192.168.4.10/system     //远程连接
+virsh -c qemu:///system(默认选项)
+
+qemu-img 是虚拟机的磁盘管理命令
+qemu-img 支持非常多的磁盘格式,例如 raw、qcow2、vdi、vmdk 等等
+qemu-img 命令格式
+  qemu-img 命令 参数 块文件名称 大小
+常用的命令有
+  create 创建一个磁盘
+  convert 转换磁盘格式
+  info 查看磁盘信息
+  snapshot 管理磁盘快照
+
+创建新的镜像盘文件
+  qemu-img create -f 格式 磁盘路径 大小
+  qemu-img create -f qcow2 disk.img 50G
+查询镜像盘文件的信息
+  qemu-img info 磁盘路径
+  qemu-img info disk.img
+-b：使用后端模板文件
+  qemu-img create -b disk.img -f qcow2 disk1.img
+
+virsh 管理虚拟网络
+  net-list              //查看虚拟网络
+  net-define vbr.xml    //创建虚拟网络
+  net-undefine vbr      //初除虚拟网络
+  net-start vbr         //启劢虚拟网络
+  net-destroy vbr       //停止虚拟网络
+  net-edit vbr          //修改 vbr 网络的配置
+  net-autostart vbr     //设置 vbr 虚拟网络开机自启劢
+
+########################################################################################
+
+xml
+  导出xml配置文件
+    查看:virsh dumpxml 虚拟机名
+    备份:virsh dumpxml 虚拟机名 > 虚拟机名.xml
+
+***********************
+  yum provides 命令  *
+  yum install 包名   *
+***********************
+
+lftp sftp://ip地址/ -u 用户名
+
+########################################################################################
+
+docker**
+  是完整的一套容器管理系统
+  提供了一组命令,让用户更加方便直接地使用容器技术,而丌需要过多关心底层内核技术
+
+容器
+容器技术已经成为应用程序封装和交付的核心技术
+  容器技术的核心有以下几个内核技术组成:
+    CGroups(Control Groups)-资源管理
+    NameSpace-进程隔离
+  SELinux安全
+    由于是在物理机上实施隔离,启动一个容器,可以像启动一个进程一样快速
+
+Docker优点
+  相比于传统的虚拟化技术,容器更加简洁高效
+  传统虚拟机需要给每个VM安装操作系统
+  容器使用的共享公共库和程序
+
+Docker优点
+  相比于传统的虚拟化技术,容器更加简洁高效
+  传统虚拟机需要给每个VM安装操作系统
+  容器使用的共享公共库和程序
+
+什么是镜像
+  在Docker中容器是基于镜像启动的
+  镜像是启动容器的核心
+  镜像采用分层设计
+  使用快照的COW技术,确保底层数据丌丢失
+
+docker rm $(docker ps -aq)   //批量删除
+
+curl http://www.baidu.com -o index.html
+
+dd if=/dev/sda of=./ff  bs=512 seek=7 count=1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
