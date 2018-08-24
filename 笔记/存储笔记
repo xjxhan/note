@@ -1,0 +1,302 @@
+SCSI:小型计算机系统接口，硬盘，光盘，磁带机等设备
+DAS:直连式存储，占用CPU、IO，数据量越大，性能越差
+NAS:网络附加存储,TCP/IP协议，采用标准NFS/HTTP/CIFS
+SAN:存储区域网络,SCSI,IP协议，接口SCSI，FC，路由器、光纤交换机
+FC:光纤通道，光纤，HBA:主机总线适配置器，FC交换机
+
+virsh list --all    //查看所有虚拟机
+virsh list     //查看在运行的虚拟机
+virsh start    //启动虚拟机
+virsh destroy  //停止虚拟机
+virsh edit     //打开文件
+virt-manager   //打开vm虚拟系统管理器
+
+man iscsiadm
+  iscsiadm --mode discoverydb --type sendtargets --portal 192.168.4.71 --discover   //发现
+  iscsiadm -m node -T iqn.2018-08.cn.tedu:sharedisk -p 192.168.4.71 -u   //loginout
+  iscsiadm -m node -T iqn.2018-08.cn.tedu:sharedisk -p 192.168.4.71 -l   //login
+
+udev:动态管理设备
+  udevadm info -a -p /sys/block/sda
+    -a:查看所有属性
+    -p:路径
+  udev常用替代变量：
+    %k：内核所识别出来的设备名，如sdb1
+    %n：设备的内核编号，如sda3中的3
+    %p：设备路径，如/sys/block/sdb/sdb1
+     %%：%符号本身
+cd /etc/udev/rules.d/
+/usr/lib/udev/scsi_id -g -u /dev/sda   //获取wwid
+vim 100-ipsan.rules
+  SUBSYSTEM=="block",ATTR{size}=="41943040",ATTRS{vendor}=="LIO-ORG ",PROGRAM=="/usr/lib/usev/scsi id -g -u $devnode",RESULT=="36001405cbe81020abd449bc94aa9f383" SYMLINK+="ipsan1"
+
+systemctl restart systemd-udev-trigger.service
+
+$devnode:磁盘
+$devpath:分区
+
+***********************************************************************************************
+错误：mount: 文件系统类型错误、选项错误、/dev/sda 上有坏超级块、缺少代码页或助手程序，或其他错误 *
+解决：                                                                                                     *
+  fsck /dev/sdax   //修复                                                                            *
+***********************************************************************************************
+
+#####################################################################################
+
+多路径multipath
+  装包：yum install -y device-mapper-multipath
+  发现多路径：iscsiadm --mode discoverydb --type sendtargets --portal 192.168.4.71 --discover
+     lsblk
+  修改配置文件：mpathconf --user_friendly_names n    //生成配置文件/etc/multipath.conf
+  multipath -F   //clear多路径
+  multipath -ll  //查看,！！！！不能处于挂载状态
+
+#####################################################################################
+
+LVS:虚拟服务器，内核实现高可用
+
+ipvsadm
+  -A:添加虚拟服务器
+  -a:添加真实服务器
+  -d:删除真实服务器
+  -t:设置集群地址（vip）
+  -s:指定负载调度算法
+  -r:指定真实服务器地址
+  -m:使用NAT模式
+  -g:使用DR模式
+  -i:使用TUN模式
+  -n:不解析
+  -w:设置权重，默认为1
+  -L:查看
+  
+
+vim /etc/sysctl.conf
+  net.ipv4.ip_forward=1
+sysctl -p
+
+
+arp -n    //查看mac地址
+
+
+ip addr ls dev eth0           //查看某个ip
+ip addr add dev eth0 ip地址     //添加新的ip地址，一个网卡多个ip
+ip addr del dev eth0 ip地址     //删除
+
+ssh-keyscan 主机名     //扫描，会跳过yes|no
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+iscsiadm --mode discoverydb --type sendtargets --portal 192.168.4.71 --discover
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+iscsiadm --mode discoverydb --type sendtargets --portal 192.168.4.71 --discover
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
