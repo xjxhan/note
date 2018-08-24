@@ -1,0 +1,137 @@
+监控
+
+系统监控命令
+  ps           进程
+  uptime       cpu负载
+  free         查看内存
+  swapon -s    交换分区
+  df -h        磁盘
+  ifconfig     网卡
+  nerstat/ss   端口
+  ping         查看网络连接信息
+  traceroute   监控路由
+  isotat       看磁盘读写性能,不加数字是平均值，加上数字第一个时平均值，余下的是实时值
+
+一般企业做监控的目的：实时报告系统状态，提前发现系统的问题。
+监控的资源可以分为：共有数据（HTTP、FTP等）和私有数据（CPU、内存、进程数等）。
+监控软件可以使用：系统自带的命令、Cacti监控系统、Nagios监控系统、Zabbix监控系统。
+
+自动化监控系统
+  Cacti（仙人掌）:基于SNMP协议的监控软件，强大的绘图能力
+  Nagios:基于Agent监控，强大的状态检查与报警机制，插件多，自己写监控脚本潜入到Nagios非常方便
+  Zabbix:基于多种监控机制，支持分布式监控
+
+nginx优化：
+  并发量
+  缓存
+  buffer
+  压缩
+  包头缓存
+
+Zsbbix依赖包：
+  net-snmp-devel:监控网络设备（交换机，路由器）
+  curl-devel:监控公有设备
+  libevent-devel-2.0.21-4.el7.x86_64.rpm:驱动
+
+./configure
+--enable-server:监控服务器
+--enable-agent:被监控端
+--enable-proxy:启用代理
+--with-mysql=/usr/bin/mysql_config:找到mysql的位置
+--with-net-snmp:监控网络设备
+--with-libcurl:能监控公有设备
+
+
+自定义的监控项默认不会自动报警，首页也不会提示错误，需要配置触发器与报警动作才可以自定报警。
+
+什么是触发器（trigger）？
+  表达式，如内存不足300M，用户超过30个等
+  当出发条件发生后，会导致一个触发事件
+  触发事件会执行某个动作
+
+什么是动作（action）？
+  动作是触发器的条件被触发后所执行的行为
+  可以是发送邮件、也可以是重启某个服务等
+
+触发器表达式
+  创建触发器时需要定义表达式，触发器表达式（Expression）是触发异常的条件，触发器表达式格式如下：
+  {<server>:<key>.<function>(<parameter>)}<operator><constant>
+  {主机：key.函数(参数)}<表达式>常数
+      参数:写时间
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

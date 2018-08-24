@@ -1,0 +1,801 @@
+Shell输出颜色控制：
+
+文字颜色30-37：
+echo -e "\033[30m 黑色字 \033[0m" 
+echo -e "\033[31m 红色字 \033[0m" 
+echo -e "\033[32m 绿色字 \033[0m" 
+echo -e "\033[33m 黄色字 \033[0m" 
+echo -e "\033[34m 蓝色字 \033[0m" 
+echo -e "\033[35m 紫色字 \033[0m" 
+echo -e "\033[36m 天蓝字 \033[0m" 
+echo -e "\033[37m 白色字 \033[0m"
+
+背景颜色40-47
+echo -e "\033[40;37m 黑底白字 \033[0m" 
+echo -e "\033[41;37m 红底白字 \033[0m" 
+echo -e "\033[42;37m 绿底白字 \033[0m" 
+echo -e "\033[43;37m 黄底白字 \033[0m" 
+echo -e "\033[44;37m 蓝底白字 \033[0m" 
+echo -e "\033[45;37m 紫底白字 \033[0m" 
+echo -e "\033[46;37m 天蓝底白字 \033[0m" 
+echo -e "\033[47;30m 白底黑字 \033[0m"
+
+末尾控制选项：
+\33[0m 关闭所有属性
+\33[1m 设置高亮度 
+\33[4m 下划线 
+\33[5m 闪烁 
+\33[7m 反显 
+\33[8m 消隐 
+\33[30m — \33[37m 设置前景色 
+\33[40m — \33[47m 设置背景色 
+\33[nA 光标上移n行 
+\33[nB 光标下移n行 
+\33[nC 光标右移n行 
+\33[nD 光标左移n行 
+\33[y;xH设置光标位置 
+\33[2J 清屏 
+\33[K 清除从光标到行尾的内容 
+\33[s 保存光标位置 
+\33[u 恢复光标位置 
+\33[?25l 隐藏光标 
+\33[?25h 显示光标
+
+###################################################################################
+
+Linux运维
+Shell----->Python----->Java/C++
+Shell语言：不支持小数，多线程不方便
+Python语言：支持小数运算，网络编程等高级应用，支持多线程
+
+Shell：解释器程序/bin/bash
+  负责向内核翻译及传达用户/程序指令
+  相当于操作系统的“外壳”
+  交互式----命令行
+  非交互式----脚本
+# cat /etc/shells
+/bin/sh             #Unix默认shell
+/bin/bash           #Linux默认shell
+/sbin/nologin       #非登录shell
+/usr/bin/sh
+/usr/bin/bash
+/usr/sbin/nologin
+/bin/tcsh
+/bin/csh
+在RHEL系统中，实际上sh是bash的符号连接
+
+历史密令的记录数量
+  /etc/profile       #适用于所有用户
+  ～/.bash_profile   #适用于选中的用户
+
+重定向操作
+<：重定向输入：将文本输入来源有键盘改为指定文件
+
+####################################################################################
+
+Shell脚本
+  提前写好可执行语句，能够完成特定任务的文件
+  顺序、批量化处理
+  解释型程序
+常见的脚本语言：
+  Bash Shell
+  Python/Perl/Ruby
+  JSP/PHP/ASP/CGL
+  JavaScript
+
+规范shell脚本的一般组成
+  #！环境声明  #!/bin/bash  #Sha-Bang调用标记
+  #注释文本
+  可执行文本
+脚本创建“三步走”
+  1.新建文本文件
+  2.添加可执行的脚本语句
+  3.添加 x 执行权限
+脚本的执行方式
+  作为"命令字"执行：指定脚本文件的路径，前提是有 x 权限
+  作为"参数"执行：（不要求 x 权限）
+    sh  脚本文件路径
+    source  脚本文件路径
+     .  脚本文件路径
+调试Shell脚本
+  直接观察执行中的输出、报错信息
+  通过 sh -x 开启调试模式
+  在可能出错的地方设置echo
+# sh -x /root/first.sh
+
+快速配置YUM
+  1.软件仓库：http://classroom.example.com/content/rhel7.0/x86_64/dvd/
+  2.编写脚本，执行脚本快速配置yum源
+   vim /root/yum.sh
+      #!/bin/bash
+       #清理旧配置
+      rm -rf /etc/yum.repos.d/*.repo
+       #添加新配置
+      echo '[cos7]
+      name=CentOS 7.2
+      baseurl=http://classroom.example.com/content/rhel7.0/x86_64/dvd/
+      enabled=1
+      gpgcheck=0' > /etc/yum.repos.d/cos7.repo
+
+###################################################################################
+
+变量：(env:查看环境变量、set：查看所有变量)
+定义/赋值变量：
+  1.变量名称必须以字母、数字和下划线组成，区分大小写
+  2.等号两边不要有空格
+  3.不能以数字开头，不要适用关键字和特殊字符
+  4.若指定的变量以存在，相当于为此变量重新赋值
+
+预定义变量：
+  $?：返回上一条命令的状态（0正常、非0错误）
+  $#：加载位置变量个数（求和所有位置变量个数）
+  $*：所有位置变量值
+  $0：当前所在进程的脚本名
+  $$：当前运行进程的PID号
+
+位置变量：跟在脚本后面提供的参数
+  $1,$2,$3......$10
+
+环境变量:系统定义的可直接使用 
+  PWD,HOME,USER,PATH,
+  新定义环境变量：
+    修改配置文件：/etc/profile
+    expect 变量名=值
+    expect KING="i am king"
+
+变量的作用范围
+  局部变量
+    新定义的变量默认只在当前Shell环境中有效
+    无法在子Shell环境中使用
+  全局变量
+    全局变量在当前Shell及子Shell环境中均有效
+    使用export可将局部变量声明为全局变量
+  export  局部变量名=变量值  #为局部变量添加全局属性
+  export  -n  全局变量名     #取消指定变量的全局属性
+
+# cjb=yuxiao  #在当前环境定义变量cjb
+# bash        #新开子bash进程
+# echo $cjb   #看不到
+# exit        #退出子进程
+# export cjb  #传递父进程变量的全局属性给子进程
+# bash
+# echo $cjb
+
+# export -n cjb  #在父进程下取消变量的全局属性
+# bash
+# echo $cjb   #看不到
+
+read：从键盘读入变量完成赋值
+  格式：read -p “提示信息：” 变量名
+  -p可选、-t可指定超市秒数
+
+# vim /usr/sbin/myuseradd
+  #!/bin/bash
+  read -p "需要添加的用户名：" $username
+  read -p "需要设置的登录密码：" $password
+  useradd $username   #调用变量
+  echo $password | passwd --stdin $username
+
+#!/bin/bash
+read -p "login：" username
+stty -echo
+read -p "password：" password
+stty echo
+echo
+echo "你的登录名是 $username"
+echo "你的密码是 $password"
+
+终端显示控制：
+  stty -echo  #关闭终端输出（无显示）
+  stty echo   #恢复终端输出（显示）
+
+!!!!! 在crontab计划任务里 % 表示注释
+
+###################################################################################
+
+*********************************************************************************************
+在server0上编写脚本 rhce_demo.sh,执行脚本后完成以下任务
+  1.自动部署号web服务器
+    网页来自 http://classroom/pub/materials/station.html -O index.html
+  2.自动调整号防火墙策略
+    禁止网段 172.34.0.0/24 访问
+    允许其他任何客户机访问
+    实现端口转发 5423和80一样效果
+
+# vim /root/rhce_demo.sh
+  #!/bin/bash
+  yum -y install httpd
+  wget http://classroom/pub/materials/station.html -O /var/www/html/index.html
+  systemctl start httpd
+  systemctl enable httpd
+
+  systemctl reatart firewalld
+  systemctl enable  firewalld
+  firewall-cmd --set-default-zone=trusted
+  firewall-cmd --permanent --zone=public --add-source=172.25.0.0/24
+  firewall-cmd --permanent --zone=trusted --add-forward-port=port=5423:proto=tcp:toport=80
+
+# chmod +x /root/rhce_demo.sh
+# /root/rhce_demo.sh
+
+*********************************************************************************************
+
+###################################################################################
+
+条件测试：[ 测试表达式 ]    echo $?:判断真假（为0真，否则为假）
+  常用测试选项：   
+      检查文件状态(test)：
+        -e：文档存在为真    [ -e /etc ]
+        -d：文档存在，且目录为真  [ -d /etc ]
+        -f：文档存在，且文件为真  [ -f /etc/passwd ]
+        -r：文档存在，且具备读取权限为真
+        -w：文档存在，且具备写入权限为真
+        -x：文档存在，且具备执行权限为真
+          !：取反  [ ! -f /etc/passwd ]  #文件不存在为真
+      比较整数大小：greater(大于) 、 little(小于) 、 equal(等于)
+        -gt：大于
+        -ge：大于等于
+        -eq：等于
+        -ne：不等于
+        -lt：小于
+        -le：小于等于
+      字符串比对：
+        -z：字符串的值为空为真
+        -n：字符串的值不为空为真
+          ==：字符串相等为真  [ root == $USER ]
+         ！=：字符串不相等为真  [ root != redhat]
+      逻辑测试/分隔：
+         &&与（而且）：条件都成立，为真  [ -e /etc ] && echo yes || echo no
+         ||非（或且）：条件有一个成立，为真  [ -r /etc ]&& echo yes || echo no
+
+##################################################################################
+
+判断语句：if语句、case语句（只判断2个内容是否匹配）
+
+if选择结构：单分支，双分支，多分支
+
+  if单分支处理：
+        if [条件表达式];then 
+             命令序列xx       
+        fi
+
+  if双分支处理：
+        if [条件表达式];then 
+             命令序列xx
+        elif [条件表达式];then
+             命令序列yy
+        fi
+
+  if多分支处理：
+        if [条件表达式];then 
+             命令序列xx
+        elif [条件表达式];then
+             命令序列yy
+        elif [条件表达式];then
+             命令序列aa
+           ……
+        else
+             命令序列zz
+        fi
+
+case判断：
+  case $变量名 in
+    模式1）
+        命令序列 ;;
+    模式2）
+        命令序列 ;;
+    模式3）
+        命令序列 ;;
+    *)
+        命令序列 ;;
+  esac
+
+循环结构：for循环、while循环、
+
+for循环结构：
+  for 变量 in 值1 值2......值n
+  do
+      命令序列
+  done
+
+  for 变量 in ((初始化变量值;结束循环条件;运算))
+  do
+     命令序列
+  done
+
+while循环：
+  while [ 条件 ]
+  do
+      命令序列
+  done
+
+  while read -r line
+  do
+      命令序列
+  done < file
+
+%f：实数型
+%d：整数型
+%lf：长实数型 （double）
+%c：字符型
+%s：字符串型
+
+###################################################################################
+
+uuidgen:随机MAC地址
+pgrep:查进程 （pgrep .  #列出所有进程）
+$RANDOM:随机数
+basename:获取路径
+seq  -w  1  20 生成等宽数列
+man ssh_config 搜索/Stri n跳到下一个 StrictHostKeyChecking
+
+子串截取
+  1.使用 ${} 表达式
+    格式：${var:起始位置:长度}
+    编号从0开始，可省略
+  echo ${var:0:6}  #截取从0开始到第6个字符
+  echo ${var::6}   #省略0
+  echo ${var:6}    #截取第6个以后到尾部的字符
+  2.使用 expr substr
+    格式：expr substr "$var" 起始位置 长度
+    编号从1开始
+  expr substr "$var" 1 6  #截取1到6个字符
+  3.使用 cut 工具
+    格式：echo $var | cut -b 起始位置-结束位置
+  echo $var | cut -b 1-6  #截取1到6个字符
+  echo $var | cut -b -6   #省略1
+   命令行 | cut -b 起始位置-结束位置
+   命令行 | cut -b -结束位置
+   命令行 | cut -b 起始位置-
+   命令行 | cut -b 字符位置
+   命令行 | cut -d ‘分隔符’ -f 起始字段-结束字段
+
+替换：
+  ${变量名/old/new}
+  ${变量名//old/new}  #全部替换
+掐头：
+  ${变量名#*关键词}
+  ${变量名##*关键词}    #从左向右最长删除
+去尾：
+  ${变量名%关键词*}
+  ${变量名%%关键词*}    #从右向左最长删除
+
+初始值：
+  变量名={变量名:-初始值}
+  ${变量名:初始值}
+
+数组：
+  数组名=（值1 值2 值3 ......）
+  ${数组名[下标编号]}  #调用数组，下标从零开始
+  数组名[下标]=新值    #更改数组值
+  ${#数组名[@]}、${#变量名}   #查看变量个数
+
+expect 预期交互
+  安装软件：expect
+脚本嵌入expect：
+  #!/bin/bash
+  其他shell语句......
+  expect << EOF
+  spawn ssh、ftp等交互操作的命令行
+  expect "预计会出现的提示信息" {send "需要输入的信息\r"}   #\r：回车
+  expect "预计会出现的提示信息" {send "需要输入的信息\r"}
+  expect "预计会出现的提示信息" {send "需要输入的信息\r"}
+  EOF  #必须顶格写
+
+正则表达式：使用特殊的字符来表示不确定的字符串
+egrep过滤工具
+  常用命令选项
+    -i:忽略大小写
+    -v:取反
+    -c:统计行数
+    -n:所在行号
+    -w:值显示匹配单词
+    -q:静默、无任何输出
+
+  单字匹配：
+    ^:匹配以什么开头
+    $:以什么结尾
+    .:任意单个字符
+
+  指定匹配次数：
+    +：最少一次
+    ？：最多一次
+    *：任意多次
+   {n}:匹配n次
+   {n,m}:匹配n到m次
+   {m,}：最少m次
+   {,n}:最多m次
+
+  指定匹配范围：
+    [almax45]:匹配当中所有的
+    [a-z]:任意小写
+    [A-Z]:任意大写
+     [0-9]:任意数字
+    [a-Z0-9]:任意字母或数字
+    [^A-Z]:匹配包括非大写字母的行
+    ^[^a-z]:匹配不以小写字母开头的行
+
+  整体及边界：
+    （）：组合为整体
+     |：或者
+    \b:单词边界
+     \<:单词开头
+     \>:单词结束
+     \:转义，可以为一些普通字符赋予特殊含义，或者将一些特殊字符变为普通字符
+
+###################################################################################
+
+Sed：流式编辑器（记事本，word，vim：交互）
+   非交互，基于模式匹配过滤及修改文本
+   逐行处理，并将结果输出到屏幕
+   可实现对文本的输出、删除、替换、复制、剪切、导入、导出等各种操作
+
+！！！！非交互，逐行处理
+
+格式：前置命令 | sed 选项 '编辑指令'
+     sed 选项 '编辑指令' 文件
+
+条件可以是行号或者/正则/
+  没有条件时，默认为所有条件
+  指令可以是增、删、改、查等指令
+  默认sed会将所有输出的内容都打印出来，可以使用-n屏蔽默认输出
+  选项中可以使用-r选项，让sed支持扩展正则
+
+常见命令选项：
+  -n（屏蔽默认输出，默认sed会输出读取文档的全部内容）
+  -r（让sed支持扩展正则）
+  -i（sed直接修改源文件，默认sed只是通过内存临时修改文件，源文件无影响）
+常用动作指令：
+  p 打印
+  d 删除
+  s 替换s/旧/新/g(某个关键字)
+  a 追加
+  i 插入
+  c 替换行(一整行)
+  h,H 小写覆盖，大写追加(复制)
+  g,G 小写覆盖，大写追加（粘贴）
+	s/old/new/:将没行的第1个old替换为new
+	s/old/new/3:将没行的第3个old替换为new
+	s/old/new/g:将所有 的old都替换为new
+  替换操作的分隔"/"可改用其他字符，如#、&等，便于修改文件路径
+
+常用命令操作：
+  p：打印
+# sed '1p' /etc/hosts  
+#可以发现所有的行都被显示出来了（第1行重复2次）。—— 正确的用法应该添加 -n 选项，这样就可以只显示第1行了
+# sed -n '1p' /etc/hosts
+
+# sed  -n '3,6p' /etc/passwd  #打印passwd第3到第6行账户的信息
+# sed -n '3p;6p' /etc/passwd  #打印passwd第3行和第6行账户的信息
+# sed -n '3,+10p' /etc/passwd #打印第3以及后面的10行
+# sed -n '1~2p' /etc/passwd     #打印奇数行
+ 	1：代表起始，2：代表步长(意思是1+2+2+2+2.......)
+# sed -n '2~2p' /etc/passwd     //打印偶数行
+# sed -n '/root/p' /etc/passwd  //打印包含root的行
+# sed -n '/^root/p' /etc/passwd //打印以root开头的行
+# sed -n '/bash$/p' /etc/passw  //打印bash结尾的行
+# sed -n 'p' /etc/passwd        //没有条件，则表示匹配所有行,等同于cat /etc/passwd
+# sed  -n '$=' /etc/passwd      //输出文件的行 
+  =：表示行号
+
+  d：删除
+正常情况下，sed命令所做的处理只是把操作结果（包括打印、删除等）输出到当前终端屏幕，而并不会对原始文件做任何更改
+# sed 'd' /etc/passwd       //删除所有行
+# cat /etc/passwd           //查看原始文本，并未改动
+# sed  '3,5d' a.txt         //删除第3~5行
+# sed  '/xml/d' a.txt       /删除所有包含xml的行
+# sed  '/xml/!d' a.txt      //删除不包含xml的行，!符号表示取反
+# sed  '/^install/d' a.txt  //删除以install开头的行
+# sed  '$d' a.txt           //删除文件的最后一行
+# sed  '/^$/d' a.txt        //删除所有空行
+
+  s：替换
+（s/旧内容/新内容/选项）：
+# vim  test.txt                //新建素材
+	017 2011 2018
+	2017 2017 2024
+	2017 2017 2017
+# sed 's/2017/xxxx/'           test.txt  //把每行的第一个2017替换为xxxx
+# sed 's/2017/xxxx/g'          test.txt  //把全文的2017都替换为xxxx
+# sed 's/2017/xxxx/2'          test.txt  //把每行的第2个字符2017替换为xxxx
+# sed 's/2017//2'              test.txt  //把每行的第2个字符2017都删除（替换为空串）
+# sed -n 's/2017/xxxx/p'       test.txt  //把每行的第一个2017替换为xxxx打印出来
+# sed 's#/bin/bash#/sbin/sh#'  a.txt     //将/bin/bash替换为/sbin/sh
+
+# sed '4,7s/^/#/'   a.txt   //将第4~7行注释掉（行首加#号）
+# sed 's/^#an/an/'  a.txt   //解除以#an开头的行的注释（去除行首的#号）
+# sed -n '/root/s/^/#/p' /etc/passwd     //把带root的行前面加上#号
+
+！！！！注意：替换操作的分隔“/”可改用其他字符，如#、&等(任意字符)，便于修改文件路径
+！！！！在sed里（）有保留的功能
+        （abc）(ttt)(ccc)  \3:把ccc复制粘贴
+
+# sed -r 's/^(.)(.*)(.)$/\3\2\1/' text.txt  //把首尾字符调换
+# sed -r 's/^(.)(.)(.*)(.)(.)$/\1\4\3\2\5/' text.txt  //把到数第2个和正数第2个调换
+	第1个保留 第4个和第2个对调 第5个保留
+
+###################################################################################
+
+sed多行文本处理:
+  # sed [选项] '条件指令' 文件..
+    i： 在指定的行之前插入文本
+    a： 在指定的行之后追加文本
+    c： 替换指定的行
+
+# sed  '2a XX'   a.txt   //在第二行后面，追加XX
+# sed  '2i XX'   a.txt   //在第二行前面，插入XX
+# sed  '2c XX'   a.txt   //将第二行替换为XX
+# sed 's/$/hongyan/' /etc/hosts   //在每行的后面追加
+# sed '2s/$/hongyan/' /etc/hosts   //在第2行的后面追加
+
+# sed 'r /etc/hosts' a.txt    //把/etc/hosts都读入到a中
+# sed '3r /etc/hosts' a.txt   //把/etc/hosts第3行读入到a
+# sed 'w /b.txt' a.txt        //把a.txt的文件全部导入到b，如果b有东西会被覆盖，没有则创建
+# sed '1,2w /c.txt' a.txt     //把a中的第1，2行导入到c
+
+# sed '3H;5G' a.txt    //把a的第3行追加到第5行后面，回车会变成一行空白
+# sed '3H;5G' a.txt    //把a的第3行覆盖到第5行后面（包括第5行），回车也会被覆盖
+
+###################################################################################
+
+awk:基本用法
+  获取指定的数据
+  对文本数据做统计
+格式：awk [选项] '[条件]{指令}' 文件
+  其中，print 是最常用的编辑指令；若有多条编辑指令，可用分号分隔。
+  Awk过滤数据时支持仅打印某一列，如第2列、第5列等。
+  处理文本时，若未指定分隔符，则默认将空格、制表符(tab)等作为分隔符。
+  -F 可指定分隔符
+
+！！！！逐行处理，指令必须用{}花括号括起来
+！！！！打印某一！！！！列,支持正则
+
+[root@svr5 ~]# cat test.txt 
+hello the world
+welcome to beijing
+[root@svr5 ~]# awk '{print $1,$3}' test.txt        //打印文档第1列和第3列
+hello world
+welcome beijing
+
+{print $1}  //只打印第1列
+{print $2}  //第2列
+{print $1，$2}  //第1列，第2列
+{print $3}
+
+[root@svr5 ~]# df -h | awk '{print $4}'        //打印磁盘的剩余空间
+
+# awk -F: '{print $1}' /etc/passwd | sed -n '10p'  //打印第10行的第1列
+# df -h | awk '{print $4}' | sed '1d'    //显示磁盘的第4列，
+
+awk常用内置变量：
+  $0    文本当前行的全部内容
+  $1	文本的第1列
+  $2	文件的第2列
+  $3	文件的第3列，依此类推
+  NR	文件当前行的行号
+  NF	文件当前行的列数（有几列）
+
+输出每次处理行的行号，以及当前行以“:”分隔的字段个数（有几列）：
+[root@svr5 ~]# awk -F: '{print NR,NF}' passwd.txt
+1 7
+2 7
+3 7
+.. ..
+
+awk的print指令不仅可以打印变量，还可以打印常量
+！！！！常量和字符串必须用""引号引起来
+
+[root@svr5 ~]# awk -F: '{print $1,"的解释器:",$7}' /etc/passwd
+            # awk -F: '{print $1,"的解释器:",$NF}' /etc/passwd
+root 的解释器: /bin/bash
+bin 的解释器: /sbin/nologin
+… …
+
+tailf:动态查看
+free:显示系统中已用和未用的内存空间总和
+      显示系统中已用和未用的、物理内存和交换内存、共享内存、内核使用的缓冲区的总和.
+  total:总体的
+  used：用过的
+  free：自由的
+  buffers：缓冲区
+  cached：缓存区（隐藏的）
+  -h:显示单为（df相同）
+
+# vim /var/www/cgi-bin/test.html
+# cd /var/www/cgi-bin
+# cat test.html
+#!/bin/bash
+echo "Context-type:text/html"
+echo ""
+mem=`free | awk '/Mem/{print $4}'`
+ip=`ifconfig eth0 | awk '/inet /{print $2}'`
+
+date
+echo "</br>"
+echo "本机IP是:$ip"
+echo "</br>"
+echo "本机内存是:$mem"
+
+awk处理的时机:
+  awk会逐行处理文本，支持在处理第一行之前做一些准备工作，以及在处理完最后一行之后做一些总结性质的工作。
+  awk  [选项]  '[条件]{指令}'  文件
+  awk  [选项]  ' BEGIN{指令} {指令} END{指令}'  文件
+		       初始化                 统计
+  BEGIN{ } 行前处理，读取文件内容前执行，指令执行1次
+  { } 逐行处理，读取文件过程中执行，指令执行n次
+  END{ } 行后处理，读取文件结束后执行，指令执行1次
+
+！！！！只做预处理的时候，可以没有操作文件
+
+[root@svr5 ~]# awk 'BEGIN{A=24;print A*2}'
+[root@svr5 ~]# awk 'BEGIN{print x+1}'           #x可以不定义，直接用，默认值位0
+[root@svr5 ~]# awk 'BEGIN{print 3.2+3.5}'
+
+# awk 'BEGIN{x=0}/bash$/{x++}END{print x}' /etc/passwd   //输出bash结尾的有多少个
+
+\t:显示Tab制表位
+column -t:自动对齐
+sort -n：自动排序
+
+awk处理条件:
+  1.使用正则设置条件(模糊匹配)
+	~:则正里是比较符
+	!~:反向匹配
+  2.使用数值/字符串比较设置条件
+    比较符号：==(等于) !=（不等于） >（大于）
+    >=（大于等于） <（小于） <=（小于等于）
+  3.逻辑测试条件(两边可以不加空格)
+  4.数学运算
+！！！！不带指令，默认打印
+
+[root@svr5 ~]# awk -F: '$1~/root/' /etc/passwd     //只限定第1列
+[root@svr5 ~]# awk -F: 'NR==3{print}' /etc/passwd  //输出第3行（行号NR等于3）的用户记录
+[root@svr5 ~]# awk -F: '$3>=1000{print $1,$3}' /etc/passwd  
+                  //输出账户UID大于等于1000的账户名称和UID信息
+[root@svr5 ~]# awk -F: '$1=="root"' /etc/passwd   //输出用户名为“root”的行
+[root@svr5 ~]# awk -F: '$3>10 && $3<20' /etc/passwd
+		  //输出账户UID大于10并且小于20的账户信息
+[root@svr5 ~]# awk -F: '$3>1000 || $3<10' /etc/passwd
+		  //输出账户UID大于1000或者账户UID小于10的账户信息
+[root@svr5 ~]# seq  200 | awk  '$1%3==0'          //找200以内3的倍数
+[root@svr5 ~]# awk 'BEGIN{x++;print x}'           //不定义，初始值为0
+[root@svr5 ~]# awk 'BEGIN{x=8;print x+=2}'
+[root@svr5 ~]# awk 'BEGIN{x=8;x--;print x}'
+[root@svr5 ~]# awk 'BEGIN{print 2+3}'
+[root@svr5 ~]# awk 'BEGIN{print 2*3}'
+[root@svr5 ~]# awk 'BEGIN{print 2*3}'
+[root@svr5 ~]# awk 'BEGIN{ print 23%8}'
+
+awk流程控制:
+  if分支结构（单分支、双分支、多分支）
+    if(判断){指令}
+    if(判断){} else {}
+    if(判断1){} else if(判断2){} else if(判断....){}
+单分支:
+  统计/etc/passwd文件中UID小于或等于1000的用户个数：
+[root@svr5 ~]# awk -F: '{if($3<=1000){i++}}END{print i}' /etc/passwd
+  统计/etc/passwd文件中UID大于1000的用户个数：
+[root@svr5 ~]# awk -F: '{if($3>1000){i++}}END{print i}' /etc/passwd
+
+双分支:
+  分别统计/etc/passwd文件中UID小于或等于1000、UID大于1000的用户个数：
+[root@svr5 ~]# awk -F: '{if($3<=1000){i++}else{j++}}END{print i,j}' /etc/passwd
+  分别统计/etc/passwd文件中登录Shell是“/bin/bash”、 登录Shell不是“/bin/bash”的用户个数：
+[root@svr5 ~]# awk -F: '{if($7~/bash$/){i++}else{j++}} END{print i,j}' /etc/passwd
+
+awk数组:
+  数组的语法格式:
+    数组是一个可以存储多个值的变量，具体使用的格式如下：
+    定义数组的格式：数组名[下标]=元素值
+    调用数组的格式：数组名[下标]
+    遍历数组的用法：for(变量 in 数组名){print 数组名[变量]}。
+
+[root@svr5 ~]# awk 'BEGIN{a[0]=11;a[1]=88;print a[1],a[0]}'
+88 11
+[root@svr5 ~]# awk 'BEGIN{a++;print a}'
+1
+[root@svr5 ~]# awk 'BEGIN{a0++;print a0}'
+1
+[root@svr5 ~]# awk 'BEGIN{a[0]++;print a[0]}'
+1
+[root@svr5 ~]# awk 'BEGIN{a[0]=0;a[1]=11;a[2]=22; for(i in a){print i,a[i]}}'
+0 0
+1 11
+2 22
+
+！！！！注意，awk数组的下标除了可以使用数字，也可以使用字符串，字符串需要使用双引号：
+[root@svr5 ~]# awk 'BEGIN{a["hehe"]=11;print a["hehe"]}'
+11
+
+Nginx:
+  源码安装Nginx需要提前安装依赖包软件gcc,openssl-devel,pcre-devel
+Nginx默认安装路径为/usr/local/nginx,该目录下会提供4个子目录
+  /usr/local/nginx/conf	配置文件目录
+  /usr/local/nginx/html	网站页面目录
+  /usr/local/nginx/logs	Nginx日志目录
+  /usr/local/nginx/sbin	主程序目录
+
+[root@svr5 ~]# uptime                           //查看CPU负载
+[root@svr5 ~]# ifconfig eth0                    //查看网卡流量
+[root@svr5 ~]# free                             //查看内存信息
+[root@svr5 ~]# df                               //查看磁盘空间
+[root@svr5 ~]# wc -l /etc/passwd                //查看计算机账户数量
+[root@svr5 ~]# who |wc -l                       //查看登录账户数量
+[root@svr5 ~]# rpm -qa |wc -l                   //查看已安装软件包数量
+
+tr：大小写转换
+# tr '[a-z]' '[A-Z]' < test6.txt   //大小写转换
+
+
+基本正则：
+^
+*
+$
+.
+[abc]
+[^abc]
+\{n,m\}
+\(\)
+扩展正则：
++
+?
+{n,m}
+(test|taste)
+()：整体、保留：复制，粘贴
+
+
+###################################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
