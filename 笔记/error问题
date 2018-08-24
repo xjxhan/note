@@ -1,0 +1,25 @@
+openstack问题
+****************************************************************************
+
+网卡停用怎么不让它开机自起
+  解决方案：virsh net-autostart --disabled 虚拟交换机
+
+磁盘弹性扩容失败
+  解决方案：LANG=en_US.UTF-8
+
+创建云主机失败：
+  解决方案：重起openstack服务
+          systemctl restart openstack-nova-compute.service
+
+Failed to connect to server (code: 1006)
+  解决方案：主机名不正确
+
+热迁移失败
+  解决方案：可能资源不够
+
+装openstack报错
+ERROR : Failed handling answer file: Given host does not listen on port 22:
+错误：处理应答文件失败：给定主机在端口22上不侦听
+  解决方案：重起机器
+
+****************************************************************************
